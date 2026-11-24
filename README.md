@@ -8,7 +8,7 @@ Repository: [https://github.com/shuvoCodes/vscode-terminal-themes](https://githu
 
 ## 🖼️ Visual Preview
 
-![VS Code Terminal Themes Preview](./WorkInfo/Image.png)
+![VS Code Terminal Themes Preview](./.WorkInfo/Image.png)
 
 ---
 

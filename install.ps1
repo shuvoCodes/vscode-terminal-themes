@@ -1,13 +1,11 @@
 ﻿# ==============================================================================
 # shuvoCodes — VS Code Terminal Themes Installer
 # Author: Shakhawat Hossain Shuvo (https://github.com/shakhawat-hossain-shuvo)
-# Repository: https://github.com/shakhawat-hossain-shuvo/shuvoCodes
+# Repository: https://github.com/shuvoCodes/vscode-terminal-themes
 # ==============================================================================
 
-[CmdletBinding()]
-param(
-    [string]$DefaultTheme = 'Matrix'
-)
+# Default theme if not specified
+$DefaultTheme = 'Matrix'
 
 # Ensure UTF-8 output
 try {
