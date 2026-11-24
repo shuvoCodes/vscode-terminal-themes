@@ -1,5 +1,5 @@
 ﻿# Matrix Theme for shuvoCodes
-# Green on Black — Hacker / Classic
+# Green on Black - Hacker / Classic
 
 [ordered]@{
     Name            = 'Matrix'

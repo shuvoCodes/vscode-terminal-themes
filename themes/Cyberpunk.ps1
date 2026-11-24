@@ -1,5 +1,5 @@
 ﻿# Cyberpunk Theme for shuvoCodes
-# Cyan on Dark — Futuristic Neon
+# Cyan on Dark - Futuristic Neon
 
 [ordered]@{
     Name            = 'Cyberpunk'
@@ -10,7 +10,7 @@
     BracketColor    = '#00F0FF'
     SeparatorColor  = '#00F0FF'
     UserHostColor   = '#00F0FF'
-    PathColor       = '#FFFFFF'
+    PathColor       = '#FF0055'
     VenvColor       = '#FFE600'
     BranchColor     = '#52EBF9'
     BranchIconColor = '#00FF66'

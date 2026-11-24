@@ -1,11 +1,9 @@
-﻿# ==============================================================================
-# shuvoCodes — VS Code Terminal Themes Installer
+$DefaultTheme = 'Matrix'
+# ==============================================================================
+# shuvoCodes - VS Code Terminal Themes Installer
 # Author: Shakhawat Hossain Shuvo (https://github.com/shakhawat-hossain-shuvo)
 # Repository: https://github.com/shuvoCodes/vscode-terminal-themes
 # ==============================================================================
-
-# Default theme if not specified
-$DefaultTheme = 'Matrix'
 
 # Ensure UTF-8 output
 try {
@@ -21,6 +19,9 @@ $GRAY   = "$ESC[90m"
 $BOLD   = "$ESC[1m"
 $RESET  = "$ESC[0m"
 
+$CHECK = [char]0x2714
+$PARTY = [System.Char]::ConvertFromUtf32(0x1F389)
+
 $Banner = @"
 $CYAN
         __                     ______          __          
@@ -29,7 +30,7 @@ $CYAN
 (__  ) / / / /_/ /| |/ / (_) / /___/ /_/ / /_/ /  __(__  )  
 /____/_/ /_/\__,_/ |___/\___/\____/\____/\__,_/\___/____/   
 $MAGENTA
-           VS Code Terminal Themes — by shuvoCodes
+           VS Code Terminal Themes - by shuvoCodes
 $RESET
 "@
 
@@ -53,7 +54,7 @@ $ThemeNames = @(
     'RetroGreen'
 )
 
-Write-Host "  $CYAN[1/4]$RESET Creating shuvoCodes directories..."
+Write-Host "  $CYAN`[1/4`]$RESET Creating shuvoCodes directories..."
 if (-not (Test-Path $ThemesDir)) {
     New-Item -ItemType Directory -Path $ThemesDir -Force | Out-Null
 }
@@ -62,7 +63,7 @@ if (-not (Test-Path $ThemesDir)) {
 $isLocal = $PSScriptRoot -and (Test-Path (Join-Path $PSScriptRoot "prompt.ps1"))
 
 if ($isLocal) {
-    Write-Host "  $CYAN[2/4]$RESET Installing from local repository files..."
+    Write-Host "  $CYAN`[2/4`]$RESET Installing from local repository files..."
     Copy-Item -Path (Join-Path $PSScriptRoot "prompt.ps1") -Destination $PromptFile -Force
 
     $localThemes = Join-Path $PSScriptRoot "themes"
@@ -72,7 +73,7 @@ if ($isLocal) {
         }
     }
 } else {
-    Write-Host "  $CYAN[2/4]$RESET Downloading latest release from GitHub..."
+    Write-Host "  $CYAN`[2/4`]$RESET Downloading latest release from GitHub..."
     $baseUrl = "https://raw.githubusercontent.com/shuvoCodes/vscode-terminal-themes/main"
 
     try {
@@ -83,16 +84,18 @@ if ($isLocal) {
         }
     } catch {
         Write-Warning "Could not download themes from GitHub: $_"
-        Write-Host "  $YELLOW[!] Falling back to built-in themes.$RESET"
+        Write-Host "  $YELLOW`[!`]$RESET Falling back to built-in themes."
     }
 }
 
-# Initialize default theme
+# Initialize default theme and branch indicator
 if (-not (Test-Path $ConfigFile)) {
     Set-Content -Path $ConfigFile -Value $DefaultTheme -Force
 }
+$BranchConfigFile = Join-Path $InstallDir "branch.txt"
+Set-Content -Path $BranchConfigFile -Value 'Status' -Force
 
-Write-Host "  $CYAN[3/4]$RESET Configuring PowerShell Profile..."
+Write-Host "  $CYAN`[3/4`]$RESET Configuring PowerShell Profile..."
 try {
     $profilePath = $PROFILE
     if ($profilePath) {
@@ -115,24 +118,24 @@ if (Test-Path "`$HOME\.shuvoCodes\prompt.ps1") {
 # shuvoCodes END
 "@
             Add-Content -Path $profilePath -Value $hook
-            Write-Host "  $GREEN[✔]$RESET Added shuvoCodes to `$PROFILE ($profilePath)"
+            Write-Host "  $GREEN`[$CHECK`]$RESET Added shuvoCodes to `$PROFILE ($profilePath)"
         } else {
-            Write-Host "  $GREEN[✔]$RESET shuvoCodes hook already configured in `$PROFILE"
+            Write-Host "  $GREEN`[$CHECK`]$RESET shuvoCodes hook already configured in `$PROFILE"
         }
     }
 } catch {
     Write-Warning "Could not update `$PROFILE automatically: $_"
-    Write-Host "  $YELLOW[!] To complete setup, add this to your `$PROFILE manually:$RESET"
+    Write-Host "  $YELLOW`[!`]$RESET To complete setup, add this to your `$PROFILE manually:"
     Write-Host "      . `"$PromptFile`"" -ForegroundColor Gray
 }
 
-Write-Host "  $CYAN[4/4]$RESET Activating terminal themes..."
+Write-Host "  $CYAN`[4/4`]$RESET Activating terminal themes..."
 if (Test-Path $PromptFile) {
     . $PromptFile
 }
 
 Write-Host ""
-Write-Host "  $GREEN$BOLD🎉 Installation complete! Your VS Code terminal looks awesome!$RESET"
+Write-Host "  $GREEN$BOLD$PARTY Installation complete! Your VS Code terminal looks awesome!$RESET"
 Write-Host ""
 Write-Host "  $BOLDQuick Start Commands:$RESET"
 Write-Host "  $GRAY-------------------------------------------------------$RESET"

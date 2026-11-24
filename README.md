@@ -100,6 +100,26 @@ Set-TerminalTheme -ArrowStyle Greater
 Set-TerminalTheme -ArrowStyle Arrow
 ```
 
+### Change Git Branch Icon & Status Indicator:
+You can choose the Git branch indicator style:
+
+```powershell
+# 1. Status (Default — ✔ when clean/uploaded, ✗ when changed/not uploaded):
+Set-TerminalTheme -BranchIcon Status
+
+# 2. Leaf (🌿 works out of the box on Windows without Nerd Fonts):
+Set-TerminalTheme -BranchIcon Leaf
+
+# 3. Symbol (Standard Unicode branch symbol: ⎇ ):
+Set-TerminalTheme -BranchIcon Symbol
+
+# 4. NerdFont (Classic Nerd Font git branch glyph:  — requires a Nerd Font):
+Set-TerminalTheme -BranchIcon NerdFont
+
+# 5. None (Display branch name with no icon):
+Set-TerminalTheme -BranchIcon None
+```
+
 ---
 
 ## 🔍 3. Inspecting & Previewing Themes

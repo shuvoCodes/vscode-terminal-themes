@@ -1,5 +1,5 @@
 ﻿# ==============================================================================
-# shuvoCodes — VS Code Terminal Themes
+# shuvoCodes - VS Code Terminal Themes
 # Author: Shakhawat Hossain Shuvo (https://github.com/shakhawat-hossain-shuvo)
 # Repository: https://github.com/shuvoCodes/vscode-terminal-themes
 # ==============================================================================
@@ -14,22 +14,47 @@ $script:ESC = [char]27
 $script:RESET = "$script:ESC[0m"
 
 # Box drawing characters
-$script:CORNER_TOP    = [char]0x250C # ┌
-$script:HLINE         = [char]0x2500 # ─
-$script:CORNER_BOTTOM = [char]0x2514 # └
-$script:BLOCK_CURSOR  = [char]0x2588 # █
-$script:NF_BRANCH     = [char]0xF418 #  (Nerd Font Git branch)
-$script:EMOJI_BRANCH  = [System.Char]::ConvertFromUtf32(0x1F33F) # 🌿
+$script:CORNER_TOP    = [char]0x250C # Top-left corner
+$script:HLINE         = [char]0x2500 # Horizontal line
+$script:CORNER_BOTTOM = [char]0x2514 # Bottom-left corner
+$script:BLOCK_CURSOR  = [char]0x2588 # Solid block cursor
+
+# Git branch icons (Status is default: tick when uploaded/clean, cross when changed/not uploaded)
+$script:BranchIcons = [ordered]@{
+    'Status'   = 'Status'                                # Dynamic: tick when uploaded, cross when changed
+    'Leaf'     = [System.Char]::ConvertFromUtf32(0x1F33F) # Leaf emoji (Works out of the box on Windows)
+    'Symbol'   = [char]0x2387                            # Standard Unicode branch symbol (U+2387)
+    'NerdFont' = [char]0xF418                            # Nerd Font octicon (Requires Nerd Font)
+    'None'     = ''                                      # No icon
+}
+$script:SelectedBranchIcon = 'Status'
 
 # Arrow style definitions
 $script:ArrowStyles = [ordered]@{
-    'Pointer'  = [char]0x25BA # ► (100% seamless, perfectly aligns with horizontal line)
-    'Angle'    = [char]0x276F # ❯ (Oh My Posh / Starship chevron, vertically centered)
-    'Triangle' = [char]0x25B8 # ▸ (Small centered triangle)
-    'Greater'  = '>'          # > (Classic ASCII greater-than)
-    'Arrow'    = [char]0x2192 # → (Unicode arrow)
+    'Pointer'  = [char]0x25BA # Seamless pointer, perfectly aligned with horizontal line
+    'Angle'    = [char]0x276F # Centered chevron
+    'Triangle' = [char]0x25B8 # Centered small triangle
+    'Greater'  = '>'          # Classic ASCII greater-than
+    'Arrow'    = [char]0x2192 # Unicode right arrow
 }
 $script:SelectedArrowStyle = 'Pointer'
+
+# Paths
+$script:ConfigDir        = Join-Path $HOME ".shuvoCodes"
+$script:ConfigFile       = Join-Path $script:ConfigDir "theme.txt"
+$script:ArrowConfigFile  = Join-Path $script:ConfigDir "arrow.txt"
+$script:BranchConfigFile = Join-Path $script:ConfigDir "branch.txt"
+$script:ThemesDir        = Join-Path $script:ConfigDir "themes"
+
+function script:Get-BranchIcon {
+    if ($global:ShuvoCodesBranchIcon) {
+        return $global:ShuvoCodesBranchIcon
+    }
+    if ($script:SelectedBranchIcon -and $script:BranchIcons.Contains($script:SelectedBranchIcon)) {
+        return $script:BranchIcons[$script:SelectedBranchIcon]
+    }
+    return [System.Char]::ConvertFromUtf32(0x1F33F)
+}
 
 function script:Get-ArrowSymbol {
     if ($global:ShuvoCodesArrow) {
@@ -69,7 +94,7 @@ $script:BuiltinThemes = [ordered]@{
         BracketColor    = '#00F0FF'
         SeparatorColor  = '#00F0FF'
         UserHostColor   = '#00F0FF'
-        PathColor       = '#FFFFFF'
+        PathColor       = '#FF0055'
         VenvColor       = '#FFE600'
         BranchColor     = '#52EBF9'
         BranchIconColor = '#00FF66'
@@ -84,9 +109,9 @@ $script:BuiltinThemes = [ordered]@{
         AccentColor     = '#FF79C6'
         FrameColor      = '#FF79C6'
         BracketColor    = '#FF79C6'
-        SeparatorColor  = '#FF79C6'
-        UserHostColor   = '#FF79C6'
-        PathColor       = '#F8F8F2'
+        SeparatorColor  = '#6272A4'
+        UserHostColor   = '#8BE9FD'
+        PathColor       = '#BD93F9'
         VenvColor       = '#F1FA8C'
         BranchColor     = '#F8F8F2'
         BranchIconColor = '#F1FA8C'
@@ -101,9 +126,9 @@ $script:BuiltinThemes = [ordered]@{
         AccentColor     = '#E5C07B'
         FrameColor      = '#E5C07B'
         BracketColor    = '#E5C07B'
-        SeparatorColor  = '#E5C07B'
-        UserHostColor   = '#E5C07B'
-        PathColor       = '#ABB2BF'
+        SeparatorColor  = '#5C6370'
+        UserHostColor   = '#61AFEF'
+        PathColor       = '#98C379'
         VenvColor       = '#E5C07B'
         BranchColor     = '#ABB2BF'
         BranchIconColor = '#E5C07B'
@@ -118,9 +143,9 @@ $script:BuiltinThemes = [ordered]@{
         AccentColor     = '#88C0D0'
         FrameColor      = '#88C0D0'
         BracketColor    = '#88C0D0'
-        SeparatorColor  = '#88C0D0'
+        SeparatorColor  = '#4C566A'
         UserHostColor   = '#81A1C1'
-        PathColor       = '#ECEFF4'
+        PathColor       = '#D8DEE9'
         VenvColor       = '#EBCB8B'
         BranchColor     = '#ECEFF4'
         BranchIconColor = '#A3BE8C'
@@ -135,9 +160,9 @@ $script:BuiltinThemes = [ordered]@{
         AccentColor     = '#BB9AF7'
         FrameColor      = '#BB9AF7'
         BracketColor    = '#BB9AF7'
-        SeparatorColor  = '#BB9AF7'
+        SeparatorColor  = '#565F89'
         UserHostColor   = '#7AA2F7'
-        PathColor       = '#C0CAF5'
+        PathColor       = '#7DCFFF'
         VenvColor       = '#E0AF68'
         BranchColor     = '#C0CAF5'
         BranchIconColor = '#E0AF68'
@@ -152,9 +177,9 @@ $script:BuiltinThemes = [ordered]@{
         AccentColor     = '#FFFFFF'
         FrameColor      = '#FFFFFF'
         BracketColor    = '#FFFFFF'
-        SeparatorColor  = '#FFFFFF'
-        UserHostColor   = '#FFFFFF'
-        PathColor       = '#FFFFFF'
+        SeparatorColor  = '#4B5563'
+        UserHostColor   = '#9CA3AF'
+        PathColor       = '#E5E7EB'
         VenvColor       = '#FACC15'
         BranchColor     = '#FFFFFF'
         BranchIconColor = '#FDE047'
@@ -169,9 +194,9 @@ $script:BuiltinThemes = [ordered]@{
         AccentColor     = '#2AA198'
         FrameColor      = '#2AA198'
         BracketColor    = '#2AA198'
-        SeparatorColor  = '#2AA198'
-        UserHostColor   = '#2AA198'
-        PathColor       = '#93A1A1'
+        SeparatorColor  = '#586E75'
+        UserHostColor   = '#268BD2'
+        PathColor       = '#839496'
         VenvColor       = '#B58900'
         BranchColor     = '#93A1A1'
         BranchIconColor = '#859900'
@@ -186,9 +211,9 @@ $script:BuiltinThemes = [ordered]@{
         AccentColor     = '#00FF00'
         FrameColor      = '#00FF00'
         BracketColor    = '#00FF00'
-        SeparatorColor  = '#00FF00'
-        UserHostColor   = '#00FF00'
-        PathColor       = '#66FF66'
+        SeparatorColor  = '#008800'
+        UserHostColor   = '#33FF33'
+        PathColor       = '#00FF00'
         VenvColor       = '#FFFF00'
         BranchColor     = '#00FF00'
         BranchIconColor = '#00FF00'
@@ -198,73 +223,54 @@ $script:BuiltinThemes = [ordered]@{
     }
 }
 
-# Config Directory
-$script:ConfigDir = Join-Path $HOME ".shuvoCodes"
-$script:ConfigFile = Join-Path $script:ConfigDir "theme.txt"
+# ==============================================================================
+# HELPER FUNCTIONS
+# ==============================================================================
 
-# Convert Hex to ANSI 24-bit TrueColor
 function script:HexToAnsi {
-    param([string]$Hex, [switch]$Background)
-    if ($Hex -match '^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$') {
-        $r = [Convert]::ToInt32($matches[1], 16)
-        $g = [Convert]::ToInt32($matches[2], 16)
-        $b = [Convert]::ToInt32($matches[3], 16)
-        if ($Background) {
-            return "$script:ESC[48;2;$r;$g;${b}m"
-        }
+    param([string]$hex)
+    if (-not $hex) { return "$script:ESC[0m" }
+    $hex = $hex.TrimStart('#')
+    if ($hex.Length -ne 6) { return "$script:ESC[0m" }
+    try {
+        $r = [Convert]::ToInt32($hex.Substring(0, 2), 16)
+        $g = [Convert]::ToInt32($hex.Substring(2, 2), 16)
+        $b = [Convert]::ToInt32($hex.Substring(4, 2), 16)
         return "$script:ESC[38;2;$r;$g;${b}m"
+    } catch {
+        return "$script:ESC[0m"
     }
-    return "$script:ESC[0m"
 }
 
-# Resolve Theme Directory
-function script:Get-ThemesDirectory {
-    if ($PSScriptRoot -and (Test-Path (Join-Path $PSScriptRoot "themes"))) {
-        return (Join-Path $PSScriptRoot "themes")
-    }
-    $homeThemes = Join-Path $script:ConfigDir "themes"
-    if (Test-Path $homeThemes -ErrorAction SilentlyContinue) {
-        return $homeThemes
-    }
-    return $null
-}
-
-# Load a Theme by Name
 function script:Get-ThemeDefinition {
-    param([string]$ThemeName)
+    param([string]$themeName)
 
-    $themesDir = script:Get-ThemesDirectory
-    if ($themesDir) {
-        $themeFile = Join-Path $themesDir "$ThemeName.ps1"
-        if (Test-Path $themeFile) {
-            try {
-                $loaded = . $themeFile
-                if ($loaded -is [System.Collections.IDictionary]) {
-                    return $loaded
-                }
-            } catch {}
-        }
+    # 1. Check external theme file
+    $themeFile = Join-Path $script:ThemesDir "$themeName.ps1"
+    if (Test-Path $themeFile -ErrorAction SilentlyContinue) {
+        try {
+            $def = & $themeFile
+            if ($def -and $def.Name) { return $def }
+        } catch {}
     }
 
-    # Fallback to builtin
+    # 2. Check built-in fallback
     foreach ($key in $script:BuiltinThemes.Keys) {
-        if ($key -ieq $ThemeName) {
+        if ($key -ieq $themeName) {
             return $script:BuiltinThemes[$key]
         }
     }
 
-    # Default to Matrix if not found
+    # 3. Default to Matrix
     return $script:BuiltinThemes['Matrix']
 }
 
-# Cache ANSI escape codes for active theme to optimize prompt speed
-$script:ActiveTheme = $null
-$script:AnsiCache = [ordered]@{}
-
 function script:ApplyThemeColors {
     param($theme)
-    $script:ActiveTheme = $theme
-    $script:AnsiCache = [ordered]@{
+
+    $script:ActiveThemeName = $theme.Name
+
+    $script:Ansi = [ordered]@{
         Frame       = script:HexToAnsi $theme.FrameColor
         Bracket     = script:HexToAnsi $theme.BracketColor
         Separator   = script:HexToAnsi $theme.SeparatorColor
@@ -279,50 +285,25 @@ function script:ApplyThemeColors {
     }
 }
 
-# Get Branch Icon Symbol
-function script:Get-BranchIcon {
-    if ($global:ShuvoCodesBranchIcon) {
-        return $global:ShuvoCodesBranchIcon
-    }
-    if ($global:ShuvoCodesUseEmoji -or $env:SHUVOCODES_USE_EMOJI) {
-        return $script:EMOJI_BRANCH
-    }
-    return $script:NF_BRANCH
-}
+# ==============================================================================
+# MAIN PROMPT FUNCTION
+# ==============================================================================
 
-# ==============================================================================
-# PROMPT RENDERING ENGINE
-# ==============================================================================
 function global:prompt {
-    # If not yet initialized, load active theme
-    if (-not $script:ActiveTheme) {
-        $themeToLoad = 'Matrix'
-        if (Test-Path $script:ConfigFile -ErrorAction SilentlyContinue) {
-            $saved = (Get-Content $script:ConfigFile -Raw).Trim()
-            if ($saved) { $themeToLoad = $saved }
-        }
-        $themeDef = script:Get-ThemeDefinition $themeToLoad
-        script:ApplyThemeColors $themeDef
-    }
-
-    $c = $script:AnsiCache
+    $c = $script:Ansi
     $rst = $script:RESET
 
-    # 1. User & Computer Name
-    $user = $env:USERNAME
-    if (-not $user) { $user = "user" }
-    $hostName = $env:COMPUTERNAME
-    if (-not $hostName) { $hostName = "Windows" }
-    $userHost = "$user@$hostName"
+    # 1. User & Machine
+    $userHost = "$($env:USERNAME)@$($env:COMPUTERNAME)"
 
-    # 2. Project / Current Folder
-    $currentPath = (Get-Location).Path
-    $folderName = Split-Path -Leaf $currentPath
-    if (-not $folderName) {
-        $folderName = $currentPath
+    # 2. Current Folder Name
+    $currPath = $executionContext.SessionState.Path.CurrentLocation.Path
+    $folderName = Split-Path -Leaf $currPath
+    if (-not $folderName -or $folderName -eq '\' -or $folderName -eq '/') {
+        $folderName = $currPath
     }
 
-    # 3. Python Virtual Environment (if active)
+    # 3. Python Virtual Environment (.venv)
     $venvName = $null
     if ($env:VIRTUAL_ENV) {
         $venvName = Split-Path -Leaf $env:VIRTUAL_ENV
@@ -330,29 +311,36 @@ function global:prompt {
         $venvName = $env:CONDA_DEFAULT_ENV
     }
 
-    # 4. Git Branch & Status (if in repo)
+    # 4. Git Branch & Status
     $inGit = $false
-    $gitBranch = ""
+    $gitBranch = $null
     $isDirty = $false
+    $isUnpushed = $false
 
     if (Get-Command git -ErrorAction SilentlyContinue) {
-        $insideWorkTree = git rev-parse --is-inside-work-tree 2>$null
-        if ($insideWorkTree -eq 'true') {
+        $branchOut = git rev-parse --abbrev-ref HEAD 2>$null
+        if ($LASTEXITCODE -eq 0 -and $branchOut) {
             $inGit = $true
-            $gitBranch = git branch --show-current 2>$null
-            if (-not $gitBranch) {
-                $gitBranch = git rev-parse --short HEAD 2>$null
-                if (-not $gitBranch) { $gitBranch = "HEAD" }
+            $gitBranch = $branchOut.Trim()
+            if ($gitBranch -eq 'HEAD') {
+                $shortSha = git rev-parse --short HEAD 2>$null
+                $gitBranch = if ($shortSha) { ":$($shortSha.Trim())" } else { "detached" }
             }
-            $status = git status --porcelain 2>$null
-            if ($status) {
-                $isDirty = $true
+
+            $statusLines = git status --porcelain -b 2>$null
+            if ($statusLines) {
+                if ($statusLines.Count -gt 1) {
+                    $isDirty = $true
+                }
+                if ($statusLines[0] -match '\[ahead\s+\d+') {
+                    $isUnpushed = $true
+                }
             }
         }
     }
 
     # Build Line 1
-    # ┌─[username@machine]-[ my-project ]-[ (.venv) ]-[  main]
+    # Top frame with box brackets: [user@host]-[ folder ]-[ (.venv) ]-[ icon branch ]
     $topLine = "$rst$($c.Frame)$($script:CORNER_TOP)$($script:HLINE)" +
                "$($c.Bracket)[$($c.UserHost)$userHost$($c.Bracket)]" +
                "$($c.Separator)-$($c.Bracket)[ $($c.Path)$folderName $($c.Bracket)]"
@@ -361,15 +349,33 @@ function global:prompt {
         $topLine += "$($c.Separator)-$($c.Bracket)[ $($c.Venv)($venvName) $($c.Bracket)]"
     }
 
+    $isNotUploaded = ($isDirty -or $isUnpushed)
+
     if ($inGit) {
-        $bIcon = script:Get-BranchIcon
-        $topLine += "$($c.Separator)-$($c.Bracket)[ $($c.BranchIcon)$bIcon $($c.Branch)$gitBranch$($c.Bracket)]"
+        $bIcon = $null
+        $bColor = $c.BranchIcon
+
+        if ($script:SelectedBranchIcon -eq 'Status') {
+            if ($isNotUploaded) {
+                $bIcon = [char]0x2717 # Cross (not uploaded)
+                $bColor = $c.ArrowDirty
+            } else {
+                $bIcon = [char]0x2714 # Checkmark (uploaded)
+                $bColor = $c.ArrowClean
+            }
+        } else {
+            $bIcon = script:Get-BranchIcon
+            $bColor = $c.BranchIcon
+        }
+
+        $iconSpacer = if ($bIcon) { "$bIcon " } else { "" }
+        $topLine += "$($c.Separator)-$($c.Bracket)[ $bColor$iconSpacer$($c.Branch)$gitBranch $($c.Bracket)]"
     }
 
     # Build Line 2
-    # └──→ (Arrow color: clean green, dirty red, or theme clean if outside git)
+    # Arrow color: clean green or dirty red
     $arrowColor = if ($inGit) {
-        if ($isDirty) { $c.ArrowDirty } else { $c.ArrowClean }
+        if ($isNotUploaded) { $c.ArrowDirty } else { $c.ArrowClean }
     } else {
         $c.ArrowClean
     }
@@ -387,9 +393,13 @@ function global:prompt {
 
 <#
 .SYNOPSIS
-    Changes the active terminal theme.
+    Changes the active terminal theme, arrow style, or git branch icon.
 .PARAMETER Theme
     The name of the theme to apply.
+.PARAMETER ArrowStyle
+    Arrow style: Pointer, Angle, Triangle, Greater, Arrow.
+.PARAMETER BranchIcon
+    Git branch icon: Status, Leaf, Symbol, NerdFont, None.
 #>
 function global:Set-TerminalTheme {
     [CmdletBinding()]
@@ -400,8 +410,32 @@ function global:Set-TerminalTheme {
 
         [Parameter(Mandatory = $false)]
         [ValidateSet('Pointer', 'Angle', 'Triangle', 'Greater', 'Arrow', IgnoreCase = $true)]
-        [string]$ArrowStyle
+        [string]$ArrowStyle,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Status', 'Leaf', 'Symbol', 'NerdFont', 'None', IgnoreCase = $true)]
+        [string]$BranchIcon
     )
+
+    $checkMark = [char]0x2714
+
+    if ($BranchIcon) {
+        $canonicalIcon = $null
+        foreach ($k in $script:BranchIcons.Keys) {
+            if ($k -ieq $BranchIcon) {
+                $canonicalIcon = $k
+                break
+            }
+        }
+        if ($canonicalIcon) {
+            $script:SelectedBranchIcon = $canonicalIcon
+            try {
+                Set-Content -Path $script:BranchConfigFile -Value $canonicalIcon -Force -ErrorAction SilentlyContinue
+            } catch {}
+            $displayIcon = if ($canonicalIcon -eq 'Status') { "$([char]0x2714)/$([char]0x2717)" } else { $script:BranchIcons[$canonicalIcon] }
+            Write-Host "`n  $checkMark Branch icon set to: $canonicalIcon ($displayIcon)" -ForegroundColor Green
+        }
+    }
 
     if ($ArrowStyle) {
         $canonicalArrow = $null
@@ -413,12 +447,16 @@ function global:Set-TerminalTheme {
         }
         if ($canonicalArrow) {
             $script:SelectedArrowStyle = $canonicalArrow
-            Write-Host "`n  ✔ Arrow style set to: $canonicalArrow ($($script:ArrowStyles[$canonicalArrow]))" -ForegroundColor Green
+            try {
+                Set-Content -Path $script:ArrowConfigFile -Value $canonicalArrow -Force -ErrorAction SilentlyContinue
+            } catch {}
+            $displayArrow = $script:ArrowStyles[$canonicalArrow]
+            Write-Host "`n  $checkMark Arrow style set to: $canonicalArrow ($displayArrow)" -ForegroundColor Green
         }
     }
 
     if (-not $Theme) {
-        if (-not $ArrowStyle) {
+        if (-not $ArrowStyle -and -not $BranchIcon) {
             Write-Host "`nPlease specify a theme name. Example: Set-TerminalTheme -Theme Cyberpunk`n" -ForegroundColor Yellow
             Get-TerminalThemes
         }
@@ -438,62 +476,65 @@ function global:Set-TerminalTheme {
     $themeDef = script:Get-ThemeDefinition $canonical
     script:ApplyThemeColors $themeDef
 
-    # Save to config file
+    # Persist selection
     try {
         if (-not (Test-Path $script:ConfigDir -ErrorAction SilentlyContinue)) {
-            New-Item -ItemType Directory -Path $script:ConfigDir -Force -ErrorAction Stop | Out-Null
+            New-Item -ItemType Directory -Path $script:ConfigDir -Force -ErrorAction SilentlyContinue | Out-Null
         }
-        Set-Content -Path $script:ConfigFile -Value $canonical -Force -ErrorAction Stop
+        Set-Content -Path $script:ConfigFile -Value $themeDef.Name -Force -ErrorAction SilentlyContinue
     } catch {}
 
-    $esc = $script:ESC
+    $rst = "$script:ESC[0m"
+    $bld = "$script:ESC[1m"
+    $dim = "$script:ESC[90m"
     $accentAnsi = script:HexToAnsi $themeDef.AccentColor
     Write-Host ""
-    Write-Host "  $esc[1m$accentAnsi✔ Theme switched to: $($themeDef.Name)$esc[0m"
-    Write-Host "  $esc[90mColors: $($themeDef.Colors)  |  Vibe: $($themeDef.Vibe)$esc[0m"
+    Write-Host "  $bld$accentAnsi$checkMark Theme switched to: $($themeDef.Name)$rst"
+    Write-Host "  $dim Colors: $($themeDef.Colors)  |  Vibe: $($themeDef.Vibe)$rst"
     Write-Host ""
 }
 
 <#
 .SYNOPSIS
-    Lists all available terminal themes.
+    Lists all available terminal themes with descriptions and active status.
 #>
 function global:Get-TerminalThemes {
     [CmdletBinding()]
     param()
 
-    $currentName = if ($script:ActiveTheme) { $script:ActiveTheme.Name } else { 'Matrix' }
-    if (Test-Path $script:ConfigFile -ErrorAction SilentlyContinue) {
-        $saved = (Get-Content $script:ConfigFile -Raw).Trim()
-        if ($saved) { $currentName = $saved }
-    }
+    $active = $script:ActiveThemeName
+    $rst = "$script:ESC[0m"
+    $bld = "$script:ESC[1m"
+    $dim = "$script:ESC[90m"
+    $cyn = "$script:ESC[1;36m"
+    $yel = "$script:ESC[1;33m"
+    $checkMark = [char]0x2714
+    $palette   = [System.Char]::ConvertFromUtf32(0x1F3A8)
 
-    $esc = $script:ESC
     Write-Host ""
-    Write-Host "  $esc[1;36m🎨 shuvoCodes — Available Themes$esc[0m"
-    Write-Host "  $esc[90m-----------------------------------------------------------------$esc[0m"
-    Write-Host "  $esc[1mSTATUS   THEME             COLORS                VIBE$esc[0m"
-    Write-Host "  $esc[90m-----------------------------------------------------------------$esc[0m"
+    Write-Host "  $cyn$palette shuvoCodes - Available Themes$rst"
+    Write-Host "  $dim-----------------------------------------------------------------$rst"
+    Write-Host "  $bld STATUS   THEME             COLORS                VIBE$rst"
+    Write-Host "  $dim-----------------------------------------------------------------$rst"
 
     foreach ($name in $script:BuiltinThemes.Keys) {
         $t = $script:BuiltinThemes[$name]
-        $themeDef = script:Get-ThemeDefinition $name
-        $accent = script:HexToAnsi $themeDef.AccentColor
+        $isActive = ($name -ieq $active)
+        $accent = script:HexToAnsi $t.AccentColor
 
-        $isActive = ($name -ieq $currentName)
-        $statusMark = if ($isActive) { "$esc[1;32m  *  $esc[0m" } else { "     " }
-        $activeBadge = if ($isActive) { " $esc[1;32m[ACTIVE]$esc[0m" } else { "" }
+        $statusMark  = if ($isActive) { "$script:ESC[1;32m   $checkMark  $rst" } else { "      " }
+        $activeBadge = if ($isActive) { " $script:ESC[1;32m[active]$rst" } else { "" }
 
         $paddedName = $name.PadRight(16)
         $paddedColors = $t.Colors.PadRight(22)
         $vibe = $t.Vibe
 
-        Write-Host "$statusMark $accent$paddedName$esc[0m $paddedColors $esc[90m$vibe$esc[0m$activeBadge"
+        Write-Host "$statusMark $accent$paddedName$rst $paddedColors $dim$vibe$rst$activeBadge"
     }
 
-    Write-Host "  $esc[90m-----------------------------------------------------------------$esc[0m"
-    Write-Host "  $esc[90mChange theme with: $esc[1;33mSet-TerminalTheme -Theme <ThemeName>$esc[0m"
-    Write-Host "  $esc[90mPreview theme with: $esc[1;33mShow-ThemePreview -Theme <ThemeName>$esc[0m"
+    Write-Host "  $dim-----------------------------------------------------------------$rst"
+    Write-Host "  $dim Change theme with: $yel Set-TerminalTheme -Theme <ThemeName>$rst"
+    Write-Host "  $dim Preview theme with: $yel Show-ThemePreview -Theme <ThemeName>$rst"
     Write-Host ""
 }
 
@@ -520,8 +561,11 @@ function global:Show-ThemePreview {
         $themesToPreview = $script:BuiltinThemes.Keys
     }
 
-    $esc = $script:ESC
     $bIcon = script:Get-BranchIcon
+    $iconSpacer = if ($bIcon) { "$bIcon " } else { "" }
+    $rst = "$script:ESC[0m"
+    $dim = "$script:ESC[90m"
+    $bullet = [char]0x25CF
 
     foreach ($tName in $themesToPreview) {
         $t = script:Get-ThemeDefinition $tName
@@ -537,19 +581,25 @@ function global:Show-ThemePreview {
         $clean  = script:HexToAnsi $t.ArrowClean
         $dirty  = script:HexToAnsi $t.ArrowDirty
         $cursor = script:HexToAnsi $t.CursorColor
-        $rst    = $script:RESET
 
         Write-Host ""
-        Write-Host "  $accent● $($t.Name) Style$rst  $esc[90m($($t.Colors) — $($t.Vibe))$rst"
-        $demoLine1 = "  $frame$script:CORNER_TOP$script:HLINE" +
-                     "$brk[$uh" + "shuvoCodes@Windows" + "$brk]$sep-" +
-                     "$brk[ $path" + "my-project" + " $brk]$sep-" +
-                     "$brk[ $venv" + "(.venv)" + " $brk]$sep-" +
-                     "$brk[ $bico$bIcon $br" + "main" + "$brk]$rst"
-        Write-Host $demoLine1
+        $vibeLabel = "(" + $t.Colors + " - " + $t.Vibe + ")"
+        Write-Host "  $accent$bullet $($t.Name) Style$rst  $dim$vibeLabel$rst"
+        $demoClean = "  $frame$($script:CORNER_TOP)$($script:HLINE)" +
+                     "$brk" + "[" + "$uh" + "shuvoCodes@Windows" + "$brk" + "]" + "$sep" + "-" +
+                     "$brk" + "[ " + "$path" + "my-project " + "$brk" + "]" + "$sep" + "-" +
+                     "$brk" + "[ " + "$venv" + "(.venv) " + "$brk" + "]" + "$sep" + "-" +
+                     "$brk" + "[ " + "$clean" + "$([char]0x2714) " + "$br" + "main " + "$brk" + "]" + "$rst"
+        $demoDirty = "  $frame$($script:CORNER_TOP)$($script:HLINE)" +
+                     "$brk" + "[" + "$uh" + "shuvoCodes@Windows" + "$brk" + "]" + "$sep" + "-" +
+                     "$brk" + "[ " + "$path" + "my-project " + "$brk" + "]" + "$sep" + "-" +
+                     "$brk" + "[ " + "$venv" + "(.venv) " + "$brk" + "]" + "$sep" + "-" +
+                     "$brk" + "[ " + "$dirty" + "$([char]0x2717) " + "$br" + "main " + "$brk" + "]" + "$rst"
         $demoArrow = script:Get-ArrowSymbol
-        Write-Host "  $frame$script:CORNER_BOTTOM$script:HLINE$clean$demoArrow $cursor$script:BLOCK_CURSOR$rst  $esc[90m(clean working tree)$rst"
-        Write-Host "  $frame$script:CORNER_BOTTOM$script:HLINE$dirty$demoArrow $cursor$script:BLOCK_CURSOR$rst  $esc[90m(uncommitted changes)$rst"
+        Write-Host $demoClean
+        Write-Host "  $frame$($script:CORNER_BOTTOM)$($script:HLINE)$clean$demoArrow $cursor$script:BLOCK_CURSOR$rst  $dim(clean / uploaded)$rst"
+        Write-Host $demoDirty
+        Write-Host "  $frame$($script:CORNER_BOTTOM)$($script:HLINE)$dirty$demoArrow $cursor$script:BLOCK_CURSOR$rst  $dim(uncommitted / not uploaded)$rst"
     }
     Write-Host ""
 }
@@ -566,6 +616,8 @@ function global:Reset-TerminalTheme {
         [switch]$Uninstall
     )
 
+    $checkMark = [char]0x2714
+
     # Restore standard prompt function
     function global:prompt {
         "PS $($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) "
@@ -578,7 +630,7 @@ function global:Reset-TerminalTheme {
                 if ($content -match '(?ms)# shuvoCodes START.*?# shuvoCodes END\r?\n?') {
                     $cleaned = $content -replace '(?ms)# shuvoCodes START.*?# shuvoCodes END\r?\n?', ''
                     Set-Content -Path $PROFILE -Value $cleaned.Trim() -Force
-                    Write-Host "`n  [✔] shuvoCodes removed from your PowerShell `$PROFILE.`n" -ForegroundColor Green
+                    Write-Host "`n  [$checkMark] shuvoCodes removed from your PowerShell `$PROFILE.`n" -ForegroundColor Green
                 } else {
                     Write-Host "`n  [i] No shuvoCodes block found in `$PROFILE.`n" -ForegroundColor Yellow
                 }
@@ -586,9 +638,9 @@ function global:Reset-TerminalTheme {
                 Write-Host "`n  [!] Could not modify `$PROFILE: $_`n" -ForegroundColor Red
             }
         }
-        Write-Host "  [✔] Restored default PowerShell prompt.`n" -ForegroundColor Green
+        Write-Host "  [$checkMark] Restored default PowerShell prompt.`n" -ForegroundColor Green
     } else {
-        Write-Host "`n  [✔] Restored default PowerShell prompt for current session." -ForegroundColor Green
+        Write-Host "`n  [$checkMark] Restored default PowerShell prompt for current session." -ForegroundColor Green
         Write-Host "      Run: . `$PROFILE to reload your saved theme.`n" -ForegroundColor DarkGray
     }
 }
@@ -596,7 +648,7 @@ function global:Reset-TerminalTheme {
 # ==============================================================================
 # INITIALIZE
 # ==============================================================================
-# Automatically load saved theme from config (or default to Matrix)
+# 1. Load saved theme (or default to Matrix)
 $initialTheme = 'Matrix'
 if (Test-Path $script:ConfigFile -ErrorAction SilentlyContinue) {
     try {
@@ -604,5 +656,26 @@ if (Test-Path $script:ConfigFile -ErrorAction SilentlyContinue) {
         if ($saved) { $initialTheme = $saved }
     } catch {}
 }
+
+# 2. Load saved arrow style (or default to Pointer)
+if (Test-Path $script:ArrowConfigFile -ErrorAction SilentlyContinue) {
+    try {
+        $savedArrow = (Get-Content $script:ArrowConfigFile -Raw).Trim()
+        if ($savedArrow -and $script:ArrowStyles.Contains($savedArrow)) {
+            $script:SelectedArrowStyle = $savedArrow
+        }
+    } catch {}
+}
+
+# 3. Load saved branch icon (or default to Status: tick/cross)
+if (Test-Path $script:BranchConfigFile -ErrorAction SilentlyContinue) {
+    try {
+        $savedBranch = (Get-Content $script:BranchConfigFile -Raw).Trim()
+        if ($savedBranch -and $script:BranchIcons.Contains($savedBranch)) {
+            $script:SelectedBranchIcon = $savedBranch
+        }
+    } catch {}
+}
+
 $initDef = script:Get-ThemeDefinition $initialTheme
 script:ApplyThemeColors $initDef

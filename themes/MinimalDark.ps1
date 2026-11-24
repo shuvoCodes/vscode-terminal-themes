@@ -1,5 +1,5 @@
 ﻿# MinimalDark Theme for shuvoCodes
-# White on Black — Clean & Simple
+# White on Black - Clean & Simple
 
 [ordered]@{
     Name            = 'MinimalDark'
@@ -8,9 +8,9 @@
     AccentColor     = '#FFFFFF'
     FrameColor      = '#FFFFFF'
     BracketColor    = '#FFFFFF'
-    SeparatorColor  = '#FFFFFF'
-    UserHostColor   = '#FFFFFF'
-    PathColor       = '#FFFFFF'
+    SeparatorColor  = '#4B5563'
+    UserHostColor   = '#9CA3AF'
+    PathColor       = '#E5E7EB'
     VenvColor       = '#FACC15'
     BranchColor     = '#FFFFFF'
     BranchIconColor = '#FDE047'
