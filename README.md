@@ -14,35 +14,35 @@ Repository: [https://github.com/shuvoCodes/vscode-terminal-themes](https://githu
 
 ## ⚡ 1. Installation
 
-### Method A — One-Command Install from GitHub (Recommended)
-Open **PowerShell** in your VS Code terminal (or Windows Terminal) and paste:
+### 🟦 For PowerShell (Windows Terminal & VS Code)
+Open **PowerShell** and paste:
 
 ```powershell
 irm https://raw.githubusercontent.com/shuvoCodes/vscode-terminal-themes/main/install.ps1 | iex
 ```
 
-> **What this does:**
-> 1. Downloads the prompt engine and all 9 theme definitions to `~/.shuvoCodes/`.
-> 2. Adds the initialization hook to your PowerShell profile (`$PROFILE`).
-> 3. Immediately activates the default `Matrix` theme.
+---
+
+### 🟥 For Git Bash (VS Code Integrated Terminal & Git Bash)
+Open **Git Bash** and paste:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/shuvoCodes/vscode-terminal-themes/main/install.sh | bash
+```
+
+> **Synchronized Settings:** Installing from either terminal automatically sets up both **PowerShell** and **Git Bash**! Your chosen theme (`theme.txt`), arrow style (`arrow.txt`), and git branch indicator (`branch.txt`) stay 100% synchronized across both terminals.
 
 ---
 
-### Method B — Manual Installation (Cloned Repository)
-If you prefer cloning the repo locally:
+### Method B — Manual Installation (Local Clone)
+If you already cloned the repository locally:
 
 ```powershell
-# 1. Clone the repository
-git clone https://github.com/shuvoCodes/vscode-terminal-themes.git
-
-# 2. Enter directory
-cd vscode-terminal-themes
-
-# 3. Run installer
+# In PowerShell:
 .\install.ps1
 
-# 4. Reload profile
-. $PROFILE
+# In Git Bash:
+bash ./install.sh
 ```
 
 ---

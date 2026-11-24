@@ -65,6 +65,9 @@ $isLocal = $PSScriptRoot -and (Test-Path (Join-Path $PSScriptRoot "prompt.ps1"))
 if ($isLocal) {
     Write-Host "  $CYAN`[2/4`]$RESET Installing from local repository files..."
     Copy-Item -Path (Join-Path $PSScriptRoot "prompt.ps1") -Destination $PromptFile -Force
+    if (Test-Path (Join-Path $PSScriptRoot "prompt.sh")) {
+        Copy-Item -Path (Join-Path $PSScriptRoot "prompt.sh") -Destination (Join-Path $InstallDir "prompt.sh") -Force
+    }
 
     $localThemes = Join-Path $PSScriptRoot "themes"
     if (Test-Path $localThemes) {
@@ -78,6 +81,7 @@ if ($isLocal) {
 
     try {
         Invoke-RestMethod -Uri "$baseUrl/prompt.ps1" -OutFile $PromptFile
+        Invoke-RestMethod -Uri "$baseUrl/prompt.sh" -OutFile (Join-Path $InstallDir "prompt.sh") -ErrorAction SilentlyContinue
         foreach ($theme in $ThemeNames) {
             $dest = Join-Path $ThemesDir "$theme.ps1"
             Invoke-RestMethod -Uri "$baseUrl/themes/$theme.ps1" -OutFile $dest
@@ -177,6 +181,31 @@ if ($configuredCount -gt 0) {
     Write-Host "  $GREEN`[$CHECK`]$RESET Added shuvoCodes hook to $configuredCount PowerShell / VS Code profile(s)"
 } else {
     Write-Host "  $GREEN`[$CHECK`]$RESET shuvoCodes hook is active in all PowerShell / VS Code profiles"
+}
+
+# 4. Also configure Git Bash profiles (~/.bashrc, ~/.bash_profile)
+$bashHook = @"
+
+# shuvoCodes START
+if [ -f "`$HOME/.shuvoCodes/prompt.sh" ]; then
+    source "`$HOME/.shuvoCodes/prompt.sh"
+fi
+# shuvoCodes END
+"@
+
+foreach ($bProfile in @((Join-Path $HOME ".bashrc"), (Join-Path $HOME ".bash_profile"))) {
+    try {
+        if (-not (Test-Path $bProfile -ErrorAction SilentlyContinue) -and ($bProfile -match '\.bashrc$')) {
+            New-Item -ItemType File -Path $bProfile -Force -ErrorAction SilentlyContinue | Out-Null
+        }
+        if (Test-Path $bProfile -ErrorAction SilentlyContinue) {
+            $bExisting = Get-Content -Path $bProfile -Raw -ErrorAction SilentlyContinue
+            if ($bExisting -notmatch '# shuvoCodes START') {
+                Add-Content -Path $bProfile -Value $bashHook -ErrorAction SilentlyContinue
+                Write-Host "  $GREEN`[$CHECK`]$RESET Added shuvoCodes hook to Git Bash ($bProfile)"
+            }
+        }
+    } catch {}
 }
 
 Write-Host "  $CYAN`[4/4`]$RESET Activating terminal themes..."

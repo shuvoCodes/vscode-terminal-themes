@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # shuvoCodes - VS Code Terminal Themes
 # Author: Shakhawat Hossain Shuvo (https://github.com/shakhawat-hossain-shuvo)
 # Repository: https://github.com/shuvoCodes/vscode-terminal-themes
