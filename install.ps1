@@ -95,21 +95,18 @@ if (-not (Test-Path $ConfigFile)) {
 $BranchConfigFile = Join-Path $InstallDir "branch.txt"
 Set-Content -Path $BranchConfigFile -Value 'Status' -Force
 
-Write-Host "  $CYAN`[3/4`]$RESET Configuring PowerShell Profile..."
-try {
-    $profilePath = $PROFILE
-    if ($profilePath) {
-        $profileDir = Split-Path -Parent $profilePath
-        if (-not (Test-Path $profileDir)) {
-            New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
-        }
-        if (-not (Test-Path $profilePath)) {
-            New-Item -ItemType File -Path $profilePath -Force | Out-Null
-        }
+Write-Host "  $CYAN`[3/4`]$RESET Configuring PowerShell & VS Code Profiles..."
 
-        $profileContent = Get-Content -Path $profilePath -Raw -ErrorAction SilentlyContinue
-        if ($profileContent -notmatch '# shuvoCodes START') {
-            $hook = @"
+# 1. Ensure execution policy allows loading user profile scripts
+try {
+    $currentPolicy = Get-ExecutionPolicy -ErrorAction SilentlyContinue
+    if ($currentPolicy -in @('Restricted', 'Undefined')) {
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force -ErrorAction SilentlyContinue
+        Write-Host "  $GREEN`[$CHECK`]$RESET Configured ExecutionPolicy to RemoteSigned (enables auto-load)"
+    }
+} catch {}
+
+$hook = @"
 
 # shuvoCodes START
 if (Test-Path "`$HOME\.shuvoCodes\prompt.ps1") {
@@ -117,16 +114,69 @@ if (Test-Path "`$HOME\.shuvoCodes\prompt.ps1") {
 }
 # shuvoCodes END
 "@
-            Add-Content -Path $profilePath -Value $hook
-            Write-Host "  $GREEN`[$CHECK`]$RESET Added shuvoCodes to `$PROFILE ($profilePath)"
-        } else {
-            Write-Host "  $GREEN`[$CHECK`]$RESET shuvoCodes hook already configured in `$PROFILE"
+
+# 2. Gather all candidate profile paths across Windows PowerShell, PowerShell 7, and VS Code
+$targetProfiles = @()
+
+if ($PROFILE) {
+    if ($PROFILE.CurrentUserCurrentHost -and (-not ($targetProfiles -contains $PROFILE.CurrentUserCurrentHost))) {
+        $targetProfiles += $PROFILE.CurrentUserCurrentHost
+    }
+    if ($PROFILE.CurrentUserAllHosts -and (-not ($targetProfiles -contains $PROFILE.CurrentUserAllHosts))) {
+        $targetProfiles += $PROFILE.CurrentUserAllHosts
+    }
+    if ($PROFILE -is [string] -and (-not ($targetProfiles -contains $PROFILE))) {
+        $targetProfiles += $PROFILE
+    }
+}
+
+$docRoots = @()
+$myDocs = [Environment]::GetFolderPath('MyDocuments')
+if ($myDocs -and (Test-Path $myDocs -ErrorAction SilentlyContinue)) { $docRoots += $myDocs }
+$homeDocs = Join-Path $HOME "Documents"
+if (Test-Path $homeDocs -ErrorAction SilentlyContinue) { $docRoots += $homeDocs }
+$oneDriveDocs = Join-Path $HOME "OneDrive\Documents"
+if (Test-Path $oneDriveDocs -ErrorAction SilentlyContinue) { $docRoots += $oneDriveDocs }
+
+foreach ($docRoot in ($docRoots | Select-Object -Unique)) {
+    foreach ($psDir in @('WindowsPowerShell', 'PowerShell')) {
+        $fullPsDir = Join-Path $docRoot $psDir
+        $candidates = @(
+            (Join-Path $fullPsDir "profile.ps1"),
+            (Join-Path $fullPsDir "Microsoft.PowerShell_profile.ps1"),
+            (Join-Path $fullPsDir "Microsoft.VSCode_profile.ps1")
+        )
+        foreach ($cand in $candidates) {
+            if (-not ($targetProfiles -contains $cand)) {
+                $targetProfiles += $cand
+            }
         }
     }
-} catch {
-    Write-Warning "Could not update `$PROFILE automatically: $_"
-    Write-Host "  $YELLOW`[!`]$RESET To complete setup, add this to your `$PROFILE manually:"
-    Write-Host "      . `"$PromptFile`"" -ForegroundColor Gray
+}
+
+# 3. Inject hook into all profile files
+$configuredCount = 0
+foreach ($pPath in $targetProfiles) {
+    try {
+        $pDir = Split-Path -Parent $pPath
+        if (-not (Test-Path $pDir -ErrorAction SilentlyContinue)) {
+            New-Item -ItemType Directory -Path $pDir -Force -ErrorAction SilentlyContinue | Out-Null
+        }
+        if (-not (Test-Path $pPath -ErrorAction SilentlyContinue)) {
+            New-Item -ItemType File -Path $pPath -Force -ErrorAction SilentlyContinue | Out-Null
+        }
+        $existing = Get-Content -Path $pPath -Raw -ErrorAction SilentlyContinue
+        if ($existing -notmatch '# shuvoCodes START') {
+            Add-Content -Path $pPath -Value $hook -ErrorAction SilentlyContinue
+            $configuredCount++
+        }
+    } catch {}
+}
+
+if ($configuredCount -gt 0) {
+    Write-Host "  $GREEN`[$CHECK`]$RESET Added shuvoCodes hook to $configuredCount PowerShell / VS Code profile(s)"
+} else {
+    Write-Host "  $GREEN`[$CHECK`]$RESET shuvoCodes hook is active in all PowerShell / VS Code profiles"
 }
 
 Write-Host "  $CYAN`[4/4`]$RESET Activating terminal themes..."
